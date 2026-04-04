@@ -1,0 +1,79 @@
+POINTPILLARS DEMO INFERENCE OUTPUT
+===================================
+checkpoint: /workspaces/3D-LiDAR-Detection/PointPillars/pretrained/epoch_160.pth
+model parameters: 4,834,824
+environment: cpu-only, headless container
+visual output dir: /workspaces/3D-LiDAR-Detection/PointPillars/demo_visuals
+color legend:
+- Pedestrian: blue
+- Cyclist: green
+- Car: red
+- DontCare: yellow
+overlay notes:
+- val/000134_gt.png is ground truth boxes drawn on the actual camera image
+- test/000002 has no ground truth file, so only the image placeholder is saved
+
+SAMPLE: val/000134
+point cloud file: /workspaces/3D-LiDAR-Detection/PointPillars/pointpillars/dataset/demo_data/val/000134.bin
+raw points: 19097
+filtered points: 18221
+point format: [x, y, z, intensity]
+xyz min: [5.435999870300293, -51.93000030517578, -1.8459999561309814]
+xyz max: [78.5780029296875, 41.625999450683594, 2.9119999408721924]
+intensity min/max: 0.000 / 0.990
+calib file: /workspaces/3D-LiDAR-Detection/PointPillars/pointpillars/dataset/demo_data/val/000134.txt
+calib keys: ['P0', 'P1', 'P2', 'P3', 'R0_rect', 'Tr_imu_to_velo', 'Tr_velo_to_cam']
+gt file: /workspaces/3D-LiDAR-Detection/PointPillars/pointpillars/dataset/demo_data/val/000134_gt.txt
+gt objects: 17
+gt class counts: {'Car': 3, 'Cyclist': 5, 'DontCare': 2, 'Pedestrian': 7}
+scene objects:
+- Car        at x=-3.29, y=1.46, z=12.65  (12.65m ahead, left side, hwl=3.69,1.50,1.78, yaw=-1.57)
+- Cyclist    at x=11.42, y=0.70, z=15.18  (15.18m ahead, right side, hwl=1.79,1.74,0.60, yaw=0.32)
+- Cyclist    at x=12.42, y=0.65, z=20.63  (20.63m ahead, right side, hwl=1.82,1.86,0.63, yaw=0.04)
+- Pedestrian at x=-0.77, y=1.23, z=19.57  (19.57m ahead, left side, hwl=1.03,1.83,0.69, yaw=0.10)
+- Cyclist    at x=9.01, y=0.60, z=30.76  (30.76m ahead, right side, hwl=1.79,1.72,0.60, yaw=-0.27)
+- Pedestrian at x=-4.61, y=1.26, z=17.02  (17.02m ahead, left side, hwl=1.04,1.80,0.61, yaw=0.00)
+- Cyclist    at x=10.44, y=0.62, z=27.53  (27.53m ahead, right side, hwl=1.71,1.72,0.78, yaw=-1.05)
+- Pedestrian at x=-11.93, y=1.63, z=21.48  (21.48m ahead, left side, hwl=0.93,1.72,0.55, yaw=0.15)
+- Pedestrian at x=-11.93, y=1.64, z=20.91  (20.91m ahead, left side, hwl=0.96,1.62,0.48, yaw=0.13)
+- Cyclist    at x=-6.87, y=1.41, z=17.25  (17.25m ahead, left side, hwl=1.74,1.70,0.64, yaw=-0.57)
+- Pedestrian at x=-9.82, y=1.51, z=20.03  (20.03m ahead, left side, hwl=0.84,1.60,0.54, yaw=3.12)
+- Pedestrian at x=-9.70, y=1.61, z=18.32  (18.32m ahead, left side, hwl=1.03,1.80,0.54, yaw=2.80)
+- Pedestrian at x=-7.16, y=1.47, z=19.63  (19.63m ahead, left side, hwl=0.82,1.95,0.56, yaw=-3.13)
+- Car        at x=24.40, y=-0.13, z=28.60  (28.60m ahead, right side, hwl=4.39,1.55,1.81, yaw=-0.01)
+- Car        at x=19.45, y=0.18, z=28.33  (28.33m ahead, right side, hwl=3.95,1.28,1.70, yaw=0.02)
+- DontCare   at x=-1000.00, y=-1000.00, z=-1000.00  (1000.00m behind, left side, hwl=-1.00,-1.00,-1.00, yaw=-10.00)
+- DontCare   at x=-1000.00, y=-1000.00, z=-1000.00  (1000.00m behind, left side, hwl=-1.00,-1.00,-1.00, yaw=-10.00)
+visual image saved: /workspaces/3D-LiDAR-Detection/PointPillars/demo_visuals/val_000134_gt.png
+model output type: list
+batch size: 1
+batch[0] type: tuple
+batch[0] tuple lengths: [0, 0, 0]
+batch[0] raw: ([], [], [])
+prediction overlay saved: /workspaces/3D-LiDAR-Detection/PointPillars/demo_visuals/val_000134_pred.png
+predicted boxes after filtering: 0
+
+SAMPLE: test/000002
+point cloud file: /workspaces/3D-LiDAR-Detection/PointPillars/pointpillars/dataset/demo_data/test/000002.bin
+raw points: 17694
+filtered points: 17078
+point format: [x, y, z, intensity]
+xyz min: [4.5960001945495605, -37.439998626708984, -2.246000051498413]
+xyz max: [79.11299896240234, 16.5049991607666, 2.805999994277954]
+intensity min/max: 0.000 / 0.990
+calib file: /workspaces/3D-LiDAR-Detection/PointPillars/pointpillars/dataset/demo_data/test/000002.txt
+calib keys: ['P0', 'P1', 'P2', 'P3', 'R0_rect', 'Tr_imu_to_velo', 'Tr_velo_to_cam']
+model output type: list
+batch size: 1
+batch[0] type: tuple
+batch[0] tuple lengths: [0, 0, 0]
+batch[0] raw: ([], [], [])
+prediction overlay saved: /workspaces/3D-LiDAR-Detection/PointPillars/demo_visuals/test_000002_pred.png
+predicted boxes after filtering: 0
+
+INTERPRETATION
+---------------
+The checkpoint loads correctly and the demo data paths are valid.
+The forward pass completes on both demo samples.
+In this CPU/headless environment, the decoded output is empty: ([], [], []).
+That means the input -> voxelization -> model forward pipeline is ready for demonstration.

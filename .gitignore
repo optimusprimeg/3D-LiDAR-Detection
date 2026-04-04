@@ -1,0 +1,8 @@
+# Python caches
+__pycache__/
+*.pyc
+
+# Local virtual environments
+.venv/
+venv/
+PointPillars/venv/

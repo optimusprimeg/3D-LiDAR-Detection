@@ -6,4 +6,13 @@ from .process import bbox_camera2lidar, bbox3d2bevcorners, box_collision_test, \
     points_camera2lidar, setup_seed, remove_outside_points, points_in_bboxes_v2, \
     get_points_num_in_bbox, iou2d_nearest, iou2d, iou3d, iou3d_camera, iou_bev, \
     bbox3d2corners_camera, points_camera2image
-from .vis_o3d import vis_pc, vis_img_3d
+
+# Optional visualization imports for headless environments
+try:
+    from .vis_o3d import vis_pc, vis_img_3d
+except (ImportError, OSError):
+    # Visualization not available in headless environments
+    def vis_pc(*args, **kwargs):
+        raise ImportError("Open3D visualization not available. Install libgl1 for visualization support.")
+    def vis_img_3d(*args, **kwargs):
+        raise ImportError("Open3D visualization not available. Install libgl1 for visualization support.")
