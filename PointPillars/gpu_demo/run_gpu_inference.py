@@ -264,6 +264,10 @@ def main() -> int:
     parser.add_argument("--output", default="/workspaces/3D-LiDAR-Detection/PointPillars/gpu_demo/demo_inference_output.txt")
     parser.add_argument("--visual-output-dir", default="/workspaces/3D-LiDAR-Detection/PointPillars/gpu_demo/demo_visuals")
     parser.add_argument("--no-cuda", action="store_true", help="disable GPU and run on CPU only")
+    parser.add_argument("--score-thr", type=float, default=0.10, help="classification confidence threshold")
+    parser.add_argument("--nms-thr", type=float, default=0.01, help="NMS IoU threshold")
+    parser.add_argument("--nms-pre", type=int, default=100, help="top-k proposals before NMS")
+    parser.add_argument("--max-num", type=int, default=50, help="max boxes after NMS")
     args = parser.parse_args()
 
     # Automatically detect GPU availability
@@ -293,6 +297,10 @@ def main() -> int:
     model = PointPillars(nclasses=3)
     checkpoint = torch.load(args.ckpt, map_location=device)
     model.load_state_dict(checkpoint)
+    model.score_thr = float(args.score_thr)
+    model.nms_thr = float(args.nms_thr)
+    model.nms_pre = int(args.nms_pre)
+    model.max_num = int(args.max_num)
     model.to(device)
     model.eval()
 
@@ -302,6 +310,7 @@ def main() -> int:
     lines.append(f"checkpoint: {args.ckpt}")
     lines.append(f"model parameters: {sum(p.numel() for p in model.parameters()):,}")
     lines.append(f"device: {device_name}")
+    lines.append(f"inference thresholds: score_thr={model.score_thr}, nms_thr={model.nms_thr}, nms_pre={model.nms_pre}, max_num={model.max_num}")
     lines.append(f"cuda available: {torch.cuda.is_available()}")
     if torch.cuda.is_available():
         lines.append(f"cuda device: {torch.cuda.get_device_name(0)}")

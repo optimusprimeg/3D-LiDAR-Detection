@@ -1,0 +1,11 @@
+{
+  "dataset_root": "/workspaces/3D-LiDAR-Detection/a9_dataset_r02_s01",
+  "sensor": "s110_lidar_ouster_south",
+  "output_root": "/workspaces/3D-LiDAR-Detection/kitti_format",
+  "source_pcd_frames": 282,
+  "matched_frames": 282,
+  "train_frames": 225,
+  "val_frames": 57,
+  "objects_written": 5178,
+  "objects_skipped_unmapped_or_invalid": 0
+}

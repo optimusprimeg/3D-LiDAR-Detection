@@ -1,0 +1,17 @@
+A9 BATCH INFERENCE SUMMARY (pretrained KITTI model)
+===================================================
+checkpoint: /workspaces/3D-LiDAR-Detection/PointPillars/pretrained/epoch_160.pth
+frames_tested: 10
+
+000000.bin: boxes=0, points=42376
+000001.bin: boxes=0, points=42474
+000002.bin: boxes=0, points=42383
+000003.bin: boxes=0, points=42551
+000004.bin: boxes=0, points=42640
+000005.bin: boxes=0, points=42474
+000006.bin: boxes=0, points=42520
+000007.bin: boxes=0, points=42593
+000008.bin: boxes=0, points=42412
+000009.bin: boxes=0, points=42307
+
+non_empty_predictions: 0/10

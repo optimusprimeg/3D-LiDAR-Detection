@@ -1,7 +1,12 @@
 # This file is modified from https://github.com/open-mmlab/mmdetection3d/blob/master/mmdet3d/ops/iou3d/iou3d_utils.py
 
 import torch
-from pointpillars.ops.iou3d_op import boxes_overlap_bev_gpu, boxes_iou_bev_gpu, nms_gpu, nms_normal_gpu
+from pointpillars.ops.iou3d_op import (
+    boxes_overlap_bev_gpu,
+    boxes_iou_bev_gpu,
+    nms_gpu,
+    nms_normal_gpu as nms_normal_gpu_op,
+)
 
 
 def boxes_overlap_bev(boxes_a, boxes_b):
@@ -54,15 +59,31 @@ def nms_cuda(boxes, scores, thresh, pre_maxsize=None, post_max_size=None):
     Returns:
         torch.Tensor: Indexes after nms.
     """
-    order = scores.sort(0, descending=True)[1]
+    # CPU fallback uses a different signature and returns kept indices directly.
+    try:
+        keep = nms_gpu(
+            boxes,
+            scores,
+            thresh,
+            pre_maxsize=pre_maxsize,
+            post_maxsize=post_max_size,
+        )
+        if isinstance(keep, torch.Tensor):
+            return keep.to(scores.device).contiguous()
+    except TypeError:
+        pass
 
+    # CUDA extension compatibility path.
+    order = scores.sort(0, descending=True)[1]
     if pre_maxsize is not None:
         order = order[:pre_maxsize]
     boxes = boxes[order].contiguous()
 
     keep = torch.zeros(boxes.size(0), dtype=torch.long)
     num_out = nms_gpu(boxes, keep, thresh, boxes.device.index)
-    keep = order[keep[:num_out].cuda(boxes.device)].contiguous()
+    if isinstance(num_out, torch.Tensor):
+        num_out = int(num_out.item())
+    keep = order[keep[:num_out].to(order.device)].contiguous()
     if post_max_size is not None:
         keep = keep[:post_max_size]
     return keep
@@ -79,11 +100,17 @@ def nms_normal_gpu(boxes, scores, thresh):
     Returns:
         torch.Tensor: Remaining indices with scores in descending order.
     """
+    try:
+        keep = nms_normal_gpu_op(boxes, scores, thresh)
+        if isinstance(keep, torch.Tensor):
+            return keep.to(scores.device).contiguous()
+    except TypeError:
+        pass
+
     order = scores.sort(0, descending=True)[1]
-
     boxes = boxes[order].contiguous()
-
     keep = torch.zeros(boxes.size(0), dtype=torch.long)
-    num_out = nms_normal_gpu(boxes, keep, thresh,
-                                        boxes.device.index)
-    return order[keep[:num_out].cuda(boxes.device)].contiguous()
+    num_out = nms_normal_gpu_op(boxes, keep, thresh, boxes.device.index)
+    if isinstance(num_out, torch.Tensor):
+        num_out = int(num_out.item())
+    return order[keep[:num_out].to(order.device)].contiguous()

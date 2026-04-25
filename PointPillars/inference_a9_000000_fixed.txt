@@ -1,0 +1,17 @@
+A9 INFERENCE REPORT
+===================
+checkpoint: pretrained/epoch_160.pth
+nclasses: 3
+score_thr: 0.01
+nms_pre: 1000
+max_num: 200
+pc_path: ../kitti_format/training/velodyne/000000.bin
+points_after_filter: 42376
+raw_output_type: dict
+num_boxes: 4
+score_min_max: 0.0110, 0.0239
+top_predictions:
+  01. class=Car, score=0.0239, xyz=(-41.79,49.48,-1.40), lwh=(1.83,3.81,1.54), yaw=0.81
+  02. class=Car, score=0.0115, xyz=(42.90,44.57,-1.30), lwh=(1.50,3.93,1.48), yaw=-1.92
+  03. class=Car, score=0.0114, xyz=(49.62,48.94,-0.85), lwh=(1.59,4.27,1.52), yaw=-0.52
+  04. class=Car, score=0.0110, xyz=(49.60,-49.36,-0.73), lwh=(1.64,4.54,1.58), yaw=-0.21

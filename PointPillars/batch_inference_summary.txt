@@ -1,0 +1,35 @@
+A9 BATCH INFERENCE RESULTS
+==========================
+checkpoint: pretrained/epoch_160.pth
+frames: 20
+score_thr: 0.005
+
+frame | boxes | top_score | class_breakdown
+----- | ----- | --------- | ---------------
+000000 |    15 | 0.0239 | Ped:3, Cyc:3, Car:9
+000001 |    15 | 0.0115 | Ped:2, Cyc:3, Car:10
+000002 |    13 | 0.0157 | Ped:2, Cyc:2, Car:9
+000003 |    17 | 0.0186 | Ped:3, Cyc:4, Car:10
+000004 |    13 | 0.0169 | Ped:2, Cyc:2, Car:9
+000005 |    15 | 0.0145 | Ped:2, Cyc:3, Car:10
+000006 |    20 | 0.0266 | Ped:4, Cyc:5, Car:11
+000007 |    15 | 0.0172 | Ped:3, Cyc:3, Car:9
+000008 |    13 | 0.0165 | Ped:2, Cyc:2, Car:9
+000009 |    13 | 0.0256 | Ped:2, Cyc:2, Car:9
+000010 |    13 | 0.0198 | Ped:2, Cyc:2, Car:9
+000011 |    15 | 0.0115 | Ped:2, Cyc:3, Car:10
+000012 |    13 | 0.0123 | Ped:2, Cyc:2, Car:9
+000013 |    16 | 0.0254 | Ped:3, Cyc:3, Car:10
+000014 |    14 | 0.0115 | Ped:2, Cyc:3, Car:9
+000015 |    13 | 0.0120 | Ped:2, Cyc:2, Car:9
+000016 |    12 | 0.0115 | Ped:2, Cyc:2, Car:8
+000017 |    13 | 0.0115 | Ped:2, Cyc:2, Car:9
+000018 |    13 | 0.0145 | Ped:2, Cyc:2, Car:9
+000019 |    13 | 0.0115 | Ped:2, Cyc:2, Car:9
+
+TOTALS:
+total_boxes: 284
+pedestrian: 46
+cyclist: 52
+car: 186
+avg_boxes_per_frame: 14.2

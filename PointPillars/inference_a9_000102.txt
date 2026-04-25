@@ -1,0 +1,7 @@
+A9 INFERENCE REPORT
+===================
+checkpoint: /workspaces/3D-LiDAR-Detection/PointPillars/pretrained/epoch_160.pth
+pc_path: /workspaces/3D-LiDAR-Detection/kitti_format/training/velodyne/000102.bin
+points_after_filter: 42616
+raw_output_type: tuple
+tuple_part_lengths: [0, 0, 0]

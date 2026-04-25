@@ -32,7 +32,7 @@ def judge_difficulty(annotation_dict):
     return np.array(difficultys, dtype=np.int32)
 
 
-def create_data_info_pkl(data_root, data_type, prefix, label=True, db=False):
+def create_data_info_pkl(data_root, data_type, prefix, label=True, db=False, lidar_only=False):
     sep = os.path.sep
     print(f"Processing {data_type} data..")
     ids_file = os.path.join(CUR, 'pointpillars', 'dataset', 'ImageSets', f'{data_type}.txt')
@@ -53,11 +53,17 @@ def create_data_info_pkl(data_root, data_type, prefix, label=True, db=False):
         calib_path = os.path.join(data_root, split, 'calib', f'{id}.txt') 
         cur_info_dict['velodyne_path'] = sep.join(lidar_path.split(sep)[-3:])
 
-        img = cv2.imread(img_path)
-        image_shape = img.shape[:2]
+        if (not lidar_only) and os.path.exists(img_path):
+            img = cv2.imread(img_path)
+            image_shape = img.shape[:2]
+            image_path_rel = sep.join(img_path.split(sep)[-3:])
+        else:
+            # Lidar-only datasets may not provide camera frames.
+            image_shape = (1200, 1920)
+            image_path_rel = ''
         cur_info_dict['image'] = {
             'image_shape': image_shape,
-            'image_path': sep.join(img_path.split(sep)[-3:]), 
+            'image_path': image_path_rel,
             'image_idx': int(id),
         }
 
@@ -65,12 +71,15 @@ def create_data_info_pkl(data_root, data_type, prefix, label=True, db=False):
         cur_info_dict['calib'] = calib_dict
 
         lidar_points = read_points(lidar_path)
-        reduced_lidar_points = remove_outside_points(
-            points=lidar_points, 
-            r0_rect=calib_dict['R0_rect'], 
-            tr_velo_to_cam=calib_dict['Tr_velo_to_cam'], 
-            P2=calib_dict['P2'], 
-            image_shape=image_shape)
+        if lidar_only:
+            reduced_lidar_points = lidar_points
+        else:
+            reduced_lidar_points = remove_outside_points(
+                points=lidar_points,
+                r0_rect=calib_dict['R0_rect'],
+                tr_velo_to_cam=calib_dict['Tr_velo_to_cam'],
+                P2=calib_dict['P2'],
+                image_shape=image_shape)
         saved_reduced_path = os.path.join(data_root, split, 'velodyne_reduced')
         os.makedirs(saved_reduced_path, exist_ok=True)
         saved_reduced_points_name = os.path.join(saved_reduced_path, f'{id}.bin')
@@ -132,13 +141,14 @@ def create_data_info_pkl(data_root, data_type, prefix, label=True, db=False):
 def main(args):
     data_root = args.data_root
     prefix = args.prefix
+    lidar_only = args.lidar_only
 
     ## 1. train: create data infomation pkl file && create reduced point clouds 
     ##           && create database(points in gt bbox) for data aumentation
-    kitti_train_infos_dict = create_data_info_pkl(data_root, 'train', prefix, db=True)
+    kitti_train_infos_dict = create_data_info_pkl(data_root, 'train', prefix, db=True, lidar_only=lidar_only)
 
     ## 2. val: create data infomation pkl file && create reduced point clouds
-    kitti_val_infos_dict = create_data_info_pkl(data_root, 'val', prefix)
+    kitti_val_infos_dict = create_data_info_pkl(data_root, 'val', prefix, lidar_only=lidar_only)
     
     ## 3. trainval: create data infomation pkl file
     kitti_trainval_infos_dict = {**kitti_train_infos_dict, **kitti_val_infos_dict}
@@ -146,7 +156,7 @@ def main(args):
     write_pickle(kitti_trainval_infos_dict, saved_path)
 
     ## 4. test: create data infomation pkl file && create reduced point clouds
-    kitti_test_infos_dict = create_data_info_pkl(data_root, 'test', prefix, label=False)
+    kitti_test_infos_dict = create_data_info_pkl(data_root, 'test', prefix, label=False, lidar_only=lidar_only)
 
 
 if __name__ == '__main__':
@@ -155,6 +165,8 @@ if __name__ == '__main__':
                         help='your data root for kitti')
     parser.add_argument('--prefix', default='kitti', 
                         help='the prefix name for the saved .pkl file')
+    parser.add_argument('--lidar_only', action='store_true',
+                        help='enable lidar-only preprocessing when image_2 is unavailable')
     args = parser.parse_args()
 
     main(args)
