@@ -219,9 +219,9 @@ class Head(nn.Module):
 
 class PointPillars(nn.Module):
     def __init__(self,
-                 nclasses=3, 
+                 nclasses=4,
                  voxel_size=[0.16, 0.16, 4],
-                 point_cloud_range=[0, -39.68, -3, 69.12, 39.68, 1],
+                 point_cloud_range=[-50, -50, -8, 49.84, 49.84, 5],
                  max_num_points=32,
                  max_voxels=(16000, 40000)):
         super().__init__()
@@ -242,22 +242,51 @@ class PointPillars(nn.Module):
                          out_channels=[128, 128, 128])
         self.head = Head(in_channel=384, n_anchors=2*nclasses, n_classes=nclasses)
         
-        # anchors
-        ranges = [[0, -39.68, -0.6, 69.12, 39.68, -0.6],
-                    [0, -39.68, -0.6, 69.12, 39.68, -0.6],
-                    [0, -39.68, -1.78, 69.12, 39.68, -1.78]]
-        sizes = [[0.6, 0.8, 1.73], [0.6, 1.76, 1.73], [1.6, 3.9, 1.56]]
+        # anchors must match nclasses, otherwise decode uses mismatched tensors.
+        x_min, y_min, _, x_max, y_max, _ = point_cloud_range
+        if nclasses == 3:
+            # KITTI-style class order used by pretrained weights: Pedestrian, Cyclist, Car.
+            ranges = [
+                [x_min, y_min, -0.6, x_max, y_max, -0.6],
+                [x_min, y_min, -0.6, x_max, y_max, -0.6],
+                [x_min, y_min, -1.78, x_max, y_max, -1.78],
+            ]
+            sizes = [
+                [0.6, 0.8, 1.73],
+                [0.6, 1.76, 1.73],
+                [1.6, 3.9, 1.56],
+            ]
+            self.assigners = [
+                {'pos_iou_thr': 0.5, 'neg_iou_thr': 0.35, 'min_iou_thr': 0.35},
+                {'pos_iou_thr': 0.5, 'neg_iou_thr': 0.35, 'min_iou_thr': 0.35},
+                {'pos_iou_thr': 0.6, 'neg_iou_thr': 0.45, 'min_iou_thr': 0.45},
+            ]
+        elif nclasses == 4:
+            ranges = [
+                [x_min, y_min, -1.0, x_max, y_max, -1.0],
+                [x_min, y_min, -1.0, x_max, y_max, -1.0],
+                [x_min, y_min, -1.2, x_max, y_max, -1.2],
+                [x_min, y_min, -1.6, x_max, y_max, -1.6],
+            ]
+            sizes = [
+                [1.6, 3.9, 1.56],
+                [2.7, 10.0, 3.5],
+                [0.6, 0.8, 1.73],
+                [0.6, 1.76, 1.73],
+            ]
+            self.assigners = [
+                {'pos_iou_thr': 0.6, 'neg_iou_thr': 0.45, 'min_iou_thr': 0.45},
+                {'pos_iou_thr': 0.5, 'neg_iou_thr': 0.35, 'min_iou_thr': 0.35},
+                {'pos_iou_thr': 0.5, 'neg_iou_thr': 0.35, 'min_iou_thr': 0.35},
+                {'pos_iou_thr': 0.5, 'neg_iou_thr': 0.35, 'min_iou_thr': 0.35},
+            ]
+        else:
+            raise ValueError(f"Unsupported nclasses={nclasses}, expected 3 or 4")
+
         rotations=[0, 1.57]
         self.anchors_generator = Anchors(ranges=ranges, 
                                          sizes=sizes, 
                                          rotations=rotations)
-        
-        # train
-        self.assigners = [
-            {'pos_iou_thr': 0.5, 'neg_iou_thr': 0.35, 'min_iou_thr': 0.35},
-            {'pos_iou_thr': 0.5, 'neg_iou_thr': 0.35, 'min_iou_thr': 0.35},
-            {'pos_iou_thr': 0.6, 'neg_iou_thr': 0.45, 'min_iou_thr': 0.45},
-        ]
 
         # val and test
         self.nms_pre = 100

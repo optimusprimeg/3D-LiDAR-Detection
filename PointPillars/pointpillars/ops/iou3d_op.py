@@ -19,7 +19,17 @@ def boxes_overlap_bev_cpu(boxes_a, boxes_b):
         corners = np.zeros((N, 4, 2), dtype=np.float32)
         
         for i in range(N):
-            x, y, dx, dy, yaw = boxes[i, 0], boxes[i, 1], boxes[i, 3], boxes[i, 4], boxes[i, 6]
+            # Support both [x, y, z, dx, dy, dz, yaw] and [x1, y1, x2, y2, yaw]
+            if boxes.shape[1] >= 7:
+                x, y, dx, dy, yaw = boxes[i, 0], boxes[i, 1], boxes[i, 3], boxes[i, 4], boxes[i, 6]
+            elif boxes.shape[1] == 5:
+                x1, y1, x2, y2, yaw = boxes[i, 0], boxes[i, 1], boxes[i, 2], boxes[i, 3], boxes[i, 4]
+                x = (x1 + x2) * 0.5
+                y = (y1 + y2) * 0.5
+                dx = max(x2 - x1, 1e-6)
+                dy = max(y2 - y1, 1e-6)
+            else:
+                raise ValueError(f"Unsupported box format with shape {boxes.shape}")
             
             # Half dimensions
             hdx = dx / 2
@@ -67,8 +77,9 @@ def boxes_overlap_bev_cpu(boxes_a, boxes_b):
             return x_inter * y_inter
         return 0.0
     
-    boxes_a = boxes_a.cpu().numpy() if boxes_a.is_cuda else boxes_a.numpy()
-    boxes_b = boxes_b.cpu().numpy() if boxes_b.is_cuda else boxes_b.numpy()
+    device = boxes_a.device
+    boxes_a = boxes_a.detach().cpu().numpy() if boxes_a.is_cuda else boxes_a.detach().numpy()
+    boxes_b = boxes_b.detach().cpu().numpy() if boxes_b.is_cuda else boxes_b.detach().numpy()
     
     corners_a = get_corners_2d(boxes_a)
     corners_b = get_corners_2d(boxes_b)
@@ -86,7 +97,7 @@ def boxes_overlap_bev_cpu(boxes_a, boxes_b):
             if area_a + area_b - inter_area > 0:
                 overlap[i, j] = inter_area / (area_a + area_b - inter_area)
     
-    return torch.from_numpy(overlap).to(boxes_a.device)
+    return torch.from_numpy(overlap).to(device)
 
 
 def boxes_iou_bev_cpu(boxes_a, boxes_b):

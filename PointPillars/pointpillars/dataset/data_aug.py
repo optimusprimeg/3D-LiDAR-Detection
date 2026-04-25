@@ -32,6 +32,8 @@ def dbsample(CLASSES, data_root, data_dict, db_sampler, sample_groups):
 
         # 2. sample databases bboxes
         sampled_cls_list = db_sampler[name].sample(sampled_num)
+        if len(sampled_cls_list) == 0:
+            continue
         sampled_cls_bboxes = np.array([item['box3d_lidar'] for item in sampled_cls_list], dtype=np.float32)
 
         # 3. box_collision_test
@@ -62,14 +64,17 @@ def dbsample(CLASSES, data_root, data_dict, db_sampler, sample_groups):
         avoid_coll_boxes = np.concatenate([avoid_coll_boxes, tmp_bboxes], axis=0)
         
     # merge sampled database
-    # remove raw points in sampled_bboxes firstly
-    pts = remove_pts_in_bboxes(pts, np.stack(sampled_bboxes, axis=0))
-    # pts = np.concatenate([pts, np.concatenate(sampled_pts, axis=0)], axis=0)
-    pts = np.concatenate([np.concatenate(sampled_pts, axis=0), pts], axis=0)
+    if len(sampled_bboxes) > 0:
+        # remove raw points in sampled_bboxes firstly
+        pts = remove_pts_in_bboxes(pts, np.stack(sampled_bboxes, axis=0))
+        pts = np.concatenate([np.concatenate(sampled_pts, axis=0), pts], axis=0)
+        gt_labels = np.concatenate([gt_labels, np.array(sampled_labels)], axis=0)
+        gt_names = np.concatenate([gt_names, np.array(sampled_names)], axis=0)
+        difficulty = np.concatenate([gt_difficulty, np.array(sampled_difficulty)], axis=0)
+    else:
+        difficulty = gt_difficulty
+
     gt_bboxes_3d = avoid_coll_boxes.astype(np.float32)
-    gt_labels = np.concatenate([gt_labels, np.array(sampled_labels)], axis=0)
-    gt_names = np.concatenate([gt_names, np.array(sampled_names)], axis=0)
-    difficulty = np.concatenate([gt_difficulty, np.array(sampled_difficulty)], axis=0)
     data_dict = {
             'pts': pts,
             'gt_bboxes_3d': gt_bboxes_3d,

@@ -1,0 +1,6 @@
+cd /workspaces/3D-LiDAR-Detection/PointPillars
+./venv/bin/python run_a9_inference.py \
+  --ckpt pretrained/epoch_160.pth \
+  --pc-path ../kitti_format/training/velodyne/000102.bin \
+  --score-thr 0.01 \
+  --out inference_a9_000102_relaxed.txt
